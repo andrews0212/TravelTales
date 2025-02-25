@@ -12,7 +12,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
   const MyApp({super.key});
 
   @override
@@ -20,7 +19,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -36,8 +34,23 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
+
 class _MyHomePageState extends State<MyHomePage> {
   final SQL_Helper sql_helper = SQL_Helper();
+  List<Viaje> viajes = []; // Lista local en memoria
+
+  @override
+  void initState() {
+    super.initState();
+    cargarViajes(); // Cargar viajes al iniciar
+  }
+
+  void cargarViajes() async {
+    final datos = await sql_helper.viajes();
+    setState(() {
+      viajes = datos;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,31 +64,26 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              FutureBuilder(
-                future: sql_helper.getConnection(),
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return mostrarLista(context);
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
+              mostrarLista(), // Usamos la lista local en memoria
               TextButton(
-                onPressed: () {
-                  sql_helper.insertViaje(new Viaje(
-                    destino: "destino",
-                    fecha_inicio: DateTime.now(),
-                    fecha_fin: DateTime.now(),
-                    ubicacion: "ubicacion",
-                    calificacionViaje: 5,
-                  ));
-                  setState(() {});
+                onPressed: () async {
+                  await sql_helper.insertViaje(
+                    Viaje(
+                      id: 0,
+                      destino: "Nuevo destino",
+                      fecha_inicio: DateTime.now(),
+                      fecha_fin: DateTime.now(),
+                      ubicacion: "ubicacion",
+                      calificacionViaje: 5,
+                    ),
+                  );
+                  cargarViajes(); // Solo actualizamos la lista sin redibujar todo
                 },
-
-                child: Text("añadir"),
+                child: Text("Añadir"),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                ),
               ),
             ],
           ),
@@ -84,33 +92,26 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  mostrarLista(BuildContext context) {
-    return FutureBuilder(
-      future: sql_helper.viajes(),
-      builder: (BuildContext context, AsyncSnapshot<List<Viaje>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData && snapshot.data != null) {
-            return Container(
-              height: 300, // Establece un tamaño fijo para el ListView
-              child: ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Text(snapshot.data![index].destino),
-                    subtitle: Text(snapshot.data![index].fecha_inicio.toString()),
-                  );
-                },
-              ),
-            );
-          } else {
-            return Center(child: Text('No data available'));
-          }
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+  Widget mostrarLista() {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      width: MediaQuery.of(context).size.width * 0.3,
+      child: ListView.builder(
+        itemCount: viajes.length,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            title: Text(viajes[index].destino, textAlign: TextAlign.center),
+            subtitle: Text(viajes[index].fecha_inicio.toString(), textAlign: TextAlign.center),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () async {
+                await sql_helper.deleteViaje(viajes[index].id);
+                cargarViajes(); // Eliminamos sin reconstruir todo
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }

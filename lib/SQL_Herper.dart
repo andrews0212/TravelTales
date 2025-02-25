@@ -8,7 +8,7 @@ class SQL_Helper {
   Future<Database> getConnection() async {
     final database = await openDatabase(
       'travel_tales.db',
-      version: 1,
+      version: 2,
       onCreate: (Database db, int version) async {
         // Asegúrate de que la tabla 'viajes' se crea correctamente
         await db.execute(
@@ -45,6 +45,21 @@ class SQL_Helper {
       viaje.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+  }
+
+  Future<void> deleteViaje(int? id) async {
+    final Database db = await getConnection();
+    await db.delete(
+      'viajes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+  Future<void> deleteAll() async {
+    final db = await getConnection();
+    if (db != null) {
+      await db.delete('viajes');
+    }
   }
 
 }
