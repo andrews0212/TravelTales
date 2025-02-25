@@ -1,51 +1,50 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
 import 'Viaje.dart';
-class SQL_Herper{
 
-  Future<Database> getConetion() async {
-    return openDatabase(
-        join(await getDatabasesPath(), 'doggie_database.db'),
-        onCreate: (db, version) {
-          return db.execute(
-            '''CREATE TABLE Viaje (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              destino TEXT NOT NULL,
-              fecha_inicio TEXT NOT NULL,
-              fecha_fin TEXT NOT NULL,
-              ubicacion TEXT NOT NULL,
-              calificacionViaje INTEGER NOT NULL
-          );'''
-      );}
+class SQL_Helper {
+  Database? _database;
+
+  Future<Database> getConnection() async {
+    final database = await openDatabase(
+      'travel_tales.db',
+      version: 1,
+      onCreate: (Database db, int version) async {
+        // Asegúrate de que la tabla 'viajes' se crea correctamente
+        await db.execute(
+          '''CREATE TABLE viajes(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            destino TEXT,
+            fecha_inicio TEXT,
+            fecha_fin TEXT,
+            ubicacion TEXT,
+            calificacionViaje INTEGER
+          )''',
+        );
+      },
     );
+    return database;
   }
+
   Future<List<Viaje>> viajes() async {
-    // Get a reference to the database.
-    final db = await getConetion();
+    final Database db = await getConnection();
 
-    // Query the table for all the dogs.
-    final List<Map<String, Object?>> viajeMap = await db.query('Viaje');
+    // Realiza la consulta SELECT
+    final List<Map<String, dynamic>> maps = await db.query('viajes');
 
-    // Convert the list of each dog's fields into a list of `Dog` objects.
-    return [for (final {"id": _id as int, "destino": _destino as String,
-                        "fecha_inicio": _fecha_inicio as DateTime, "fecha_fin": _fecha_fin as DateTime,
-                        "ubicacion": _ubicacion as String, "calificacionViaje": _calificacionViaje as int}
-                        in viajeMap)
-       Viaje(id: _id, destino: _destino, fecha_inicio: _fecha_inicio, fecha_fin: _fecha_fin, ubicacion: _ubicacion, calificacionViaje: _calificacionViaje)
-    ];
+    // Convierte cada mapa en un objeto 'Viaje' y lo devuelve como una lista
+    return List.generate(maps.length, (i) {
+      return Viaje.fromMap(maps[i]);
+    });
   }
-  // Define a function that inserts dogs into the database
+
   Future<void> insertViaje(Viaje viaje) async {
-
-    final db = await getConetion();
-
+    final Database db = await getConnection();
     await db.insert(
-      'Viaje',
+      'viajes',
       viaje.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
 }
-

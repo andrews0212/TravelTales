@@ -31,7 +31,9 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite: ^2.3.0
-
+  sqflite_common_ffi: ^2.0.0 # Asegúrate de usar la versión correcta de sqflite_ffi
+  path_provider: ^2.0.11 # Para obtener la ruta de almacenamiento del dispositivo
+  path: ^1.8.0 #
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8

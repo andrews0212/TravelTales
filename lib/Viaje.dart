@@ -1,69 +1,37 @@
-
 class Viaje {
-
-  int? id;
-  String _destino;
-  DateTime _fecha_inicio;
-  DateTime _fecha_fin;
-  String _ubicacion;
-  int _calificacionViaje;
-
-
-  Viaje.withId(this.id, this._destino, this._fecha_inicio, this._fecha_fin,
-      this._ubicacion, this._calificacionViaje);
+  String destino;
+  DateTime fecha_inicio;
+  DateTime fecha_fin;
+  String ubicacion;
+  int calificacionViaje;
 
   Viaje({
-    this.id,
-    required String destino,
-    required DateTime fecha_inicio,
-    required DateTime fecha_fin,
-    required String ubicacion,
-    required int calificacionViaje}) :_destino = destino, _fecha_inicio = fecha_inicio, _fecha_fin = fecha_fin, _ubicacion = ubicacion, _calificacionViaje = calificacionViaje;
+    required this.destino,
+    required this.fecha_inicio,
+    required this.fecha_fin,
+    required this.ubicacion,
+    required this.calificacionViaje,
+  });
 
-
-  int get calificacionViaje => _calificacionViaje;
-
-  set calificacionViaje(int value) {
-    _calificacionViaje = value;
-  }
-
-  String get ubicacion => _ubicacion;
-
-  set ubicacion(String value) {
-    _ubicacion = value;
-  }
-
-  DateTime get fecha_fin => _fecha_fin;
-
-  set fecha_fin(DateTime value) {
-    _fecha_fin = value;
-  }
-
-  DateTime get fecha_inicio => _fecha_inicio;
-
-  set fecha_inicio(DateTime value) {
-    _fecha_inicio = value;
-  }
-
-  String get destino => _destino;
-
-  set destino(String value) {
-    _destino = value;
-  }
-
-  Map<String, Object?> toMap() {
+  // Método para convertir un objeto 'Viaje' a un mapa para insertarlo en la base de datos
+  Map<String, dynamic> toMap() {
     return {
-      "id": id,
-      "destino": destino,
-      "fecha_inicio": fecha_inicio,
-      "fecha_fin": fecha_fin
+      'destino': destino,
+      'fecha_inicio': fecha_inicio.toIso8601String(),  // Convierte DateTime a String
+      'fecha_fin': fecha_fin.toIso8601String(),        // Convierte DateTime a String
+      'ubicacion': ubicacion,
+      'calificacionViaje': calificacionViaje,
     };
   }
 
-  @override
-  String toString() {
-    return 'Viaje{id: $id, _destino: $_destino, _fecha_inicio: $_fecha_inicio, _fecha_fin: $_fecha_fin, _ubicacion: $_ubicacion, _calificacionViaje: $_calificacionViaje}';
+  // Método para convertir un mapa de la base de datos a un objeto 'Viaje'
+  static Viaje fromMap(Map<String, dynamic> map) {
+    return Viaje(
+      destino: map['destino'],
+      fecha_inicio: DateTime.parse(map['fecha_inicio']), // Convierte el String de vuelta a DateTime
+      fecha_fin: DateTime.parse(map['fecha_fin']),       // Convierte el String de vuelta a DateTime
+      ubicacion: map['ubicacion'],
+      calificacionViaje: map['calificacionViaje'],
+    );
   }
-
-
 }
