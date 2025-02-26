@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:travel_tales/Viaje.dart';
+
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'SQL_Herper.dart';
+import 'Viaje.dart';
 
 void main() {
   sqfliteFfiInit(); // Inicializa sqflite_ffi
@@ -98,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   fecha_fin: DateTime.now().add(Duration(days: 5)),
                   ubicacion: "Ubicación Ejemplo",
                   calificacionViaje: 4,
-                ));
+                ) as Viaje);
                  cargarViajes();
                 // Espera la recarga de datos
               },
@@ -118,8 +119,8 @@ class _MyHomePageState extends State<MyHomePage> {
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, // Número de columnas
         crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 3 / 2, // Ajusta la proporción según necesites
+        mainAxisSpacing: 8,
+        childAspectRatio: 1 / 2, // Ajusta la proporción según necesites
       ),
       itemCount: viajes.length,
       itemBuilder: (BuildContext context, int index) {
@@ -141,10 +142,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 8),
-                Text("Desde: ${viaje.fecha_inicio.toLocal()}".split(' ')[0]),
-                Text("Hasta: ${viaje.fecha_fin.toLocal()}".split(' ')[0]),
-                Text("Ubicación: ${viaje.ubicacion}"),
-                Text("Calificación: ${viaje.calificacionViaje}/5"),
+                Text("Desde: ${viaje.fecha_fin.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center),
+                Text("Hasta: ${viaje.fecha_fin.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center),
+                Text("Ubicación: ${viaje.ubicacion}", textAlign: TextAlign.center),
+                Text("Calificación: ${viaje.calificacionViaje}/5", textAlign: TextAlign.center),
               ],
             ),
           ),
