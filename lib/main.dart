@@ -91,17 +91,9 @@ class _MyHomePageState extends State<MyHomePage> {
               child: mostrarListaCard(), // Cambiado para mostrar el GridView
             ),
             ElevatedButton(
-              onPressed: () async {
-                await sql_helper.insertViaje(Viaje(
-                  id: viajes.isEmpty ? 1 : viajes.last.id! + 1, // Asegura un ID único
-                  destino: "Nuevo Destino",
-                  fecha_inicio: DateTime.now(),
-                  fecha_fin: DateTime.now().add(Duration(days: 5)),
-                  ubicacion: "Ubicación Ejemplo",
-                  calificacionViaje: 4,
-                ) as Viaje);
-                 cargarViajes();
-                // Espera la recarga de datos
+              onPressed: (){
+
+
               },
               child: Text('Añadir Viaje'),
             ),
@@ -110,7 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
     );
-  }Widget mostrarListaCard() {
+  }
+  Widget mostrarListaCard() {
     if (viajes.isEmpty) {
       return Center(child: Text('No hay viajes disponibles'));
     }
@@ -146,6 +139,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text("Hasta: ${viaje.fecha_fin.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center),
                 Text("Ubicación: ${viaje.ubicacion}", textAlign: TextAlign.center),
                 Text("Calificación: ${viaje.calificacionViaje}/5", textAlign: TextAlign.center),
+                IconButton(onPressed: (){
+                  sql_helper.deleteAll();
+                  cargarViajes();
+                }, icon: Icon(Icons.delete, color: Colors.red,)),
               ],
             ),
           ),
@@ -169,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
               icon: Icon(Icons.delete),
               onPressed: () async {
                 await sql_helper.deleteViaje(viajes[index].id);
-                cargarViajes(); // Eliminamos sin reconstruir todo
+                cargarViajes();
               },
             ),
           );
