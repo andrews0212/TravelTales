@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:travel_tales/Viaje.dart';
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -47,52 +49,112 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void cargarViajes() async {
     final datos = await sql_helper.viajes();
+    print("Viajes cargados: ${datos.length}"); // Debug
     setState(() {
       viajes = datos;
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(4.0),
+            child: Container(
+              color: Colors.black,
+              height: 2.0,
+            )),
+        leading: IconButton(
+          icon: Icon(Icons.home, size: 35),
+          padding: EdgeInsets.only(left: 10.0),
+          onPressed: () {
+
+          },
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.search, size: 35),
+            padding: EdgeInsets.only(right: 10.0),
+            onPressed: () {
+              cargarViajes(); // Recargar viajes
+            },
+          ),
+        ],
       ),
       body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              mostrarLista(), // Usamos la lista local en memoria
-              TextButton(
-                onPressed: () async {
-                  await sql_helper.insertViaje(
-                    Viaje(
-                      id: 0,
-                      destino: "Nuevo destino",
-                      fecha_inicio: DateTime.now(),
-                      fecha_fin: DateTime.now(),
-                      ubicacion: "ubicacion",
-                      calificacionViaje: 5,
-                    ),
-                  );
-                  cargarViajes(); // Solo actualizamos la lista sin redibujar todo
-                },
-                child: Text("Añadir"),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
-            ],
-          ),
+        child: Column(
+          children: [
+            Expanded(
+              child: mostrarListaCard(), // Cambiado para mostrar el GridView
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await sql_helper.insertViaje(Viaje(
+                  id: viajes.isEmpty ? 1 : viajes.last.id! + 1, // Asegura un ID único
+                  destino: "Nuevo Destino",
+                  fecha_inicio: DateTime.now(),
+                  fecha_fin: DateTime.now().add(Duration(days: 5)),
+                  ubicacion: "Ubicación Ejemplo",
+                  calificacionViaje: 4,
+                ));
+                 cargarViajes();
+                // Espera la recarga de datos
+              },
+              child: Text('Añadir Viaje'),
+            ),
+          ],
         ),
       ),
+
+    );
+  }Widget mostrarListaCard() {
+    if (viajes.isEmpty) {
+      return Center(child: Text('No hay viajes disponibles'));
+    }
+    return GridView.builder(
+      padding: EdgeInsets.all(8.0),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, // Número de columnas
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 3 / 2, // Ajusta la proporción según necesites
+      ),
+      itemCount: viajes.length,
+      itemBuilder: (BuildContext context, int index) {
+        final viaje = viajes[index];
+
+        return Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          elevation: 5,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  viaje.destino,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8),
+                Text("Desde: ${viaje.fecha_inicio.toLocal()}".split(' ')[0]),
+                Text("Hasta: ${viaje.fecha_fin.toLocal()}".split(' ')[0]),
+                Text("Ubicación: ${viaje.ubicacion}"),
+                Text("Calificación: ${viaje.calificacionViaje}/5"),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget mostrarLista() {
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       width: MediaQuery.of(context).size.width * 0.3,
@@ -111,6 +173,28 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class PageAddViaje extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Añadir Viaje'),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/fondo.jpg"),
+            fit: BoxFit.cover, // Ajusta la imagen al tamaño de la pantalla
+          ),
+        ),
+        child: Center(
+          child: Text("Hola, Flutter!", style: TextStyle(color: Colors.white, fontSize: 24)),
+        ),
       ),
     );
   }

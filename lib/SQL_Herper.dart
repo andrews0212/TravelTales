@@ -1,3 +1,5 @@
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'Viaje.dart';
@@ -6,11 +8,17 @@ class SQL_Helper {
   Database? _database;
 
   Future<Database> getConnection() async {
-    final database = await openDatabase(
-      'travel_tales.db',
-      version: 2,
+    if (_database != null) return _database!;
+
+    // Get the application documents directory
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, 'travel_tales.db');
+
+    // Open the database
+    _database = await openDatabase(
+      path,
+      version: 1,
       onCreate: (Database db, int version) async {
-        // Asegúrate de que la tabla 'viajes' se crea correctamente
         await db.execute(
           '''CREATE TABLE viajes(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,16 +31,12 @@ class SQL_Helper {
         );
       },
     );
-    return database;
+    return _database!;
   }
 
   Future<List<Viaje>> viajes() async {
     final Database db = await getConnection();
-
-    // Realiza la consulta SELECT
     final List<Map<String, dynamic>> maps = await db.query('viajes');
-
-    // Convierte cada mapa en un objeto 'Viaje' y lo devuelve como una lista
     return List.generate(maps.length, (i) {
       return Viaje.fromMap(maps[i]);
     });
@@ -55,11 +59,11 @@ class SQL_Helper {
       whereArgs: [id],
     );
   }
+
   Future<void> deleteAll() async {
     final db = await getConnection();
     if (db != null) {
       await db.delete('viajes');
     }
   }
-
 }
