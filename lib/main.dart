@@ -90,13 +90,6 @@ class _MyHomePageState extends State<MyHomePage> {
             Expanded(
               child: mostrarListaCard(), // Cambiado para mostrar el GridView
             ),
-            ElevatedButton(
-              onPressed: (){
-
-
-              },
-              child: Text('Añadir Viaje'),
-            ),
           ],
         ),
       ),
@@ -104,9 +97,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
   Widget mostrarListaCard() {
-    if (viajes.isEmpty) {
-      return Center(child: Text('No hay viajes disponibles'));
-    }
     return GridView.builder(
       padding: EdgeInsets.all(8.0),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -115,10 +105,47 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisSpacing: 8,
         childAspectRatio: 1 / 2, // Ajusta la proporción según necesites
       ),
-      itemCount: viajes.length,
+      itemCount: viajes.length + 1, // Siempre hay una tarjeta extra para añadir
       itemBuilder: (BuildContext context, int index) {
-        final viaje = viajes[index];
+        if (index == 0) {
+          // Primera tarjeta: botón para añadir un viaje
+          return Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () async {
+                      await sql_helper.insertViaje(Viaje(
+                        id: viajes.isEmpty ? 1 : viajes.last.id! + 1, // Asegura un ID único
+                        destino: "Nuevo Destino",
+                        fecha_inicio: DateTime.now(),
+                        fecha_fin: DateTime.now().add(Duration(days: 5)),
+                        ubicacion: "Ubicación Ejemplo",
+                        calificacionViaje: 4,
+                      ));
+                      cargarViajes(); // Recargar lista después de añadir
+                    },
+                    icon: Icon(Icons.add, color: Colors.black, size: 50),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Añadir Viaje",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
 
+        // Tarjetas de viajes
+        final viaje = viajes[index - 1]; // Restamos 1 porque el primer índice es la tarjeta de añadir
         return Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
@@ -135,14 +162,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 8),
-                Text("Desde: ${viaje.fecha_fin.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center),
+                Text("Desde: ${viaje.fecha_inicio.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center),
                 Text("Hasta: ${viaje.fecha_fin.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center),
                 Text("Ubicación: ${viaje.ubicacion}", textAlign: TextAlign.center),
                 Text("Calificación: ${viaje.calificacionViaje}/5", textAlign: TextAlign.center),
-                IconButton(onPressed: (){
-                  sql_helper.deleteAll();
-                  cargarViajes();
-                }, icon: Icon(Icons.delete, color: Colors.red,)),
+                IconButton(
+                  onPressed: () async {
+                    await sql_helper.deleteViaje(viaje.id);
+                    cargarViajes();
+                  },
+                  icon: Icon(Icons.delete, color: Colors.red),
+                ),
               ],
             ),
           ),
@@ -150,6 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+
 
   Widget mostrarLista() {
 
