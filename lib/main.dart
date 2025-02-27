@@ -111,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
         if (index == 0) {
           // Primera tarjeta: botón para añadir un viaje
           return Card(
-            color: new Color.fromARGB(73, 0, 0, 0),
+            color: new Color.fromARGB(194, 0, 0, 0),
             shadowColor: Colors.black,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
@@ -119,22 +119,27 @@ class _MyHomePageState extends State<MyHomePage> {
             elevation: 5,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
+              child: InkWell(
+                onTap: () async {
+
+
+
+
+                  // await sql_helper.insertViaje(Viaje(
+                  //     id: viajes.isEmpty ? 1 : viajes.last.id! + 1, // Asegura un ID único
+                  //     destino: "Nuevo Destino",
+                  //     fecha_inicio: DateTime.now(),
+                  // fecha_fin: DateTime.now().add(Duration(days: 5)),
+                  // ubicacion: "Ubicación Ejemplo",
+                  // calificacionViaje: 4,
+                  // ));
+                  // cargarViajes();
+                },
+
+                child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(
-                    onPressed: () async {
-                      await sql_helper.insertViaje(Viaje(
-                        id: viajes.isEmpty ? 1 : viajes.last.id! + 1, // Asegura un ID único
-                        destino: "Nuevo Destino",
-                        fecha_inicio: DateTime.now(),
-                        fecha_fin: DateTime.now().add(Duration(days: 5)),
-                        ubicacion: "Ubicación Ejemplo",
-                        calificacionViaje: 4,
-                      ));
-                      cargarViajes(); // Recargar lista después de añadir
-                    },
-                    icon: Icon(Icons.add, color: Colors.white, size: 50),
+                  IconButton(icon: Icon(Icons.add, color: Colors.white, size: 50), onPressed: () {  },
                   ),
                   SizedBox(height: 10),
                   Text(
@@ -144,6 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
+          ),
           );
         }
 
