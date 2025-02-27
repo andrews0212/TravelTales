@@ -97,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
   Widget mostrarListaCard() {
+
     return GridView.builder(
       padding: EdgeInsets.all(8.0),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
