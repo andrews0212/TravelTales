@@ -60,27 +60,29 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(4.0),
-            child: Container(
-              color: Colors.black,
-              height: 2.0,
-            )),
-        leading: IconButton(
-          icon: Icon(Icons.home, size: 35),
-          padding: EdgeInsets.only(left: 10.0),
-          onPressed: () {
 
-          },
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255,196, 255, 249),
+        bottom: PreferredSize(
+        preferredSize: Size.fromHeight(2.0), // Grosor de la línea
+        child: Container(
+        color: Colors.black.withOpacity(0.5), // Color de la línea
+        height: 2.0, // Grosor de la línea
+        ),
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search, size: 35),
-            padding: EdgeInsets.only(right: 10.0),
-            onPressed: () {
-              cargarViajes(); // Recargar viajes
-            },
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 1, // Ajusta el ancho según necesites
+            height: 40,
+            child: SearchBar(
+              overlayColor: MaterialStateProperty.all(Colors.white12),
+              leading: const Icon(Icons.search, color: Color.fromARGB(255, 28, 90, 69)),
+              hintText: "Buscar",
+              backgroundColor: WidgetStateProperty.all(Color.fromARGB(255,156, 234, 239)),
+              elevation: MaterialStateProperty.all(0),
+              side: WidgetStateProperty.all(new BorderSide(color: Colors.black.withOpacity(0.2), width: 1)),
+
+            ),
           ),
         ],
       ),
@@ -104,17 +106,18 @@ class _MyHomePageState extends State<MyHomePage> {
         crossAxisCount: 2, // Número de columnas
         crossAxisSpacing: 10,
         mainAxisSpacing: 8,
-        childAspectRatio: 1 / 1.5, // Ajusta la proporción según necesites
+        childAspectRatio: 1 / 1.1, // Ajusta la proporción según necesites
       ),
       itemCount: viajes.length + 1, // Siempre hay una tarjeta extra para añadir
       itemBuilder: (BuildContext context, int index) {
         if (index == 0) {
           // Primera tarjeta: botón para añadir un viaje
           return Card(
-            color: new Color.fromARGB(194, 0, 0, 0),
+            color: Color.fromARGB(255,156, 234, 239),
             shadowColor: Colors.black,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
+              side: BorderSide(color: Colors.black.withOpacity(0.2)),
             ),
             elevation: 5,
             child: Padding(
@@ -125,26 +128,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
-                  // await sql_helper.insertViaje(Viaje(
-                  //     id: viajes.isEmpty ? 1 : viajes.last.id! + 1, // Asegura un ID único
-                  //     destino: "Nuevo Destino",
-                  //     fecha_inicio: DateTime.now(),
-                  // fecha_fin: DateTime.now().add(Duration(days: 5)),
-                  // ubicacion: "Ubicación Ejemplo",
-                  // calificacionViaje: 4,
-                  // ));
-                  // cargarViajes();
+                  await sql_helper.insertViaje(Viaje(
+                      id: viajes.isEmpty ? 1 : viajes.last.id! + 1, // Asegura un ID único
+                      destino: "Nuevo Destino",
+                      fecha_inicio: DateTime.now(),
+                  fecha_fin: DateTime.now().add(Duration(days: 5)),
+                  ubicacion: "Ubicación Ejemplo",
+                  calificacionViaje: 4,
+                  ));
+                  cargarViajes();
                 },
 
                 child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
 
-                  Icon(Icons.add, color: Colors.white, size: 50),
+                  Icon(Icons.add, color: Colors.black, size: 50),
                   SizedBox(height: 10),
                   Text(
                     "Añadir Viaje",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                 ],
               ),
