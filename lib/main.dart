@@ -139,8 +139,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(icon: Icon(Icons.add, color: Colors.white, size: 50), onPressed: () {  },
-                  ),
+
+                  Icon(Icons.add, color: Colors.white, size: 50),
                   SizedBox(height: 10),
                   Text(
                     "Añadir Viaje",
