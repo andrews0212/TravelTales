@@ -103,13 +103,15 @@ class _MyHomePageState extends State<MyHomePage> {
         crossAxisCount: 2, // Número de columnas
         crossAxisSpacing: 10,
         mainAxisSpacing: 8,
-        childAspectRatio: 1 / 2, // Ajusta la proporción según necesites
+        childAspectRatio: 1 / 1.5, // Ajusta la proporción según necesites
       ),
       itemCount: viajes.length + 1, // Siempre hay una tarjeta extra para añadir
       itemBuilder: (BuildContext context, int index) {
         if (index == 0) {
           // Primera tarjeta: botón para añadir un viaje
           return Card(
+            color: new Color.fromARGB(73, 0, 0, 0),
+            shadowColor: Colors.black,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             ),
@@ -131,12 +133,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       ));
                       cargarViajes(); // Recargar lista después de añadir
                     },
-                    icon: Icon(Icons.add, color: Colors.black, size: 50),
+                    icon: Icon(Icons.add, color: Colors.white, size: 50),
                   ),
                   SizedBox(height: 10),
                   Text(
                     "Añadir Viaje",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ],
               ),
@@ -147,6 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // Tarjetas de viajes
         final viaje = viajes[index - 1]; // Restamos 1 porque el primer índice es la tarjeta de añadir
         return Card(
+          color: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
