@@ -125,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: () async {
-                        cambiarVentana(context);
+                        InterfazCrearViaje().cambiarVentana(context);
 
 
 
