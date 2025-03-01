@@ -170,13 +170,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text("Ubicación: ${viaje.ubicacion}", textAlign: TextAlign.center),
                 Text("Calificación: ${viaje.calificacionViaje}/5", textAlign: TextAlign.center),
                 IconButton(
-                  onPressed: () async {
-                    
-                    await sql_helper.deleteViaje(viaje.id);
-                    cargarViajes();
-                  },
-                  icon: Icon(Icons.delete, color: Colors.red),
-                ),
+                onPressed: () async {
+                  // Llamar al método de eliminación con el objeto 'viaje'
+                  print(viaje.id);
+                  await sql_helper.deleteViaje(viaje);
+                  cargarViajes();  // Recargar los viajes después de la eliminación
+                },
+                icon: Icon(Icons.delete, color: Colors.red),
+              ),
+
               ],
             ),
           ),

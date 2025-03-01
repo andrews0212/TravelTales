@@ -81,14 +81,16 @@ Future<void> insertViaje(Viaje viaje) async {
 
 
 
-  Future<void> deleteViaje(int? id) async {
-    final Database db = await getConnection();
-    await db.delete(
-      'viajes',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
+Future<void> deleteViaje(Viaje viaje) async {
+  final Database db = await getConnection();
+  
+  // Usar el id del objeto 'viaje' para eliminar el registro correspondiente
+  await db.delete(
+    'viajes',
+    where: 'id = ?',
+    whereArgs: [viaje.id],  // Usar el id del viaje
+  );
+}
 
   Future<void> deleteAll() async {
     final db = await getConnection();

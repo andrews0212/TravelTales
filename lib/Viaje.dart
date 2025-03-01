@@ -10,6 +10,7 @@ class Viaje {
   List<String> viajes;
 
   Viaje({
+    this.id,
     required this.destino,
     required this.fecha_inicio,
     required this.fecha_fin,
@@ -34,6 +35,7 @@ class Viaje {
   // Método para convertir un mapa de la base de datos a un objeto 'Viaje'
  factory Viaje.fromMap(Map<String, dynamic> map) {
     return Viaje(
+      id: map['id'],
       destino: map['destino'] ?? 'Desconocido', // Valor por defecto si es null
       fecha_inicio: map['fecha_inicio'] != null
           ? DateTime.parse(map['fecha_inicio'])
