@@ -62,8 +62,6 @@ class SQL_Helper {
 
   Future<void> deleteAll() async {
     final db = await getConnection();
-    if (db != null) {
-      await db.delete('viajes');
+    await db.delete('viajes');
     }
-  }
 }

@@ -1,53 +1,26 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
+# Como Hacer una lista con una BD
 
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:travel_tales/InterfazCrearViaje.dart';
 
-import 'SQL_Herper.dart';
-import 'Viaje.dart';
-
-void main() {
-  sqfliteFfiInit(); // Inicializa sqflite_ffi
-  databaseFactory = databaseFactoryFfi; // Establece la fábrica de base de datos
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent ),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+```dart
 
 class _MyHomePageState extends State<MyHomePage> {
+// Primero lo que hacemos en en nuestro Pagina declarar el SQL_HELPER y La lista estatica
+// de Viaje
   final SQL_Helper sql_helper = SQL_Helper();
   List<Viaje> viajes = []; // Lista local en memoria
+
+// Luego sobreescribimos nuestro metodo initState() para poder cargar los viajes cuando
+// se inicia
 
   @override
   void initState() {
     super.initState();
     cargarViajes(); // Cargar viajes al iniciar
   }
+
+// Tenemos este metodo donde cargamos los viajes
+// este cuenta con la variable datos que es una lista de todos los viajes
+y lo actualizamos con el setState() para actualizar nuestra lista local
 
   void cargarViajes() async {
     final datos = await sql_helper.viajes();
@@ -57,37 +30,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+```
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+Luego en nuestro Body llamamos a este metodo
 
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255,196, 255, 249),
-        bottom: PreferredSize(
-        preferredSize: Size.fromHeight(2.0), // Grosor de la línea
-        child: Container(
-        color: Colors.black.withOpacity(0.5), // Color de la línea
-        height: 2.0, // Grosor de la línea
-        ),
-        ),
-        actions: <Widget>[
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 1, // Ajusta el ancho según necesites
-            height: 40,
-            child: SearchBar(
-              overlayColor: WidgetStateProperty.all(Colors.white12),
-              leading: const Icon(Icons.search, color: Color.fromARGB(255, 28, 90, 69)),
-              hintText: "Buscar",
-              backgroundColor: WidgetStateProperty.all(Color.fromARGB(255,156, 234, 239)),
-              elevation: WidgetStateProperty.all(0),
-              side: WidgetStateProperty.all(BorderSide(color: Colors.black.withOpacity(0.2), width: 1)),
-
-            ),
-          ),
-        ],
-      ),
-      body: Center(
+```dart
+body: Center(
         child: Column(
           children: [
             Expanded(
@@ -96,10 +44,19 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+```
 
-    );
-  }
-  Widget mostrarListaCard() {
+Nuestra lista esta conformada de esta forma
+
+```dart
+
+
+
+ Widget mostrarListaCard() {
+
+// primero lo que hacemos es retornar nuestro gridView
+// es importante colocarlo con el .Builder
+
     return GridView.builder(
       padding: EdgeInsets.all(8.0),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -108,8 +65,15 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisSpacing: 8,
         childAspectRatio: 1 / 1.1, // Ajusta la proporción según necesites
       ),
+
       itemCount: viajes.length + 1, // Siempre hay una tarjeta extra para añadir
+
+// aqui en el item builder es importate colocar lo que queremos que se vaya agregando a 
+// nuestra lista. En este caso lo que he hecho primero agregar una carta por defecto que
+// es la que se va a encargar de añadir los viajes
+
       itemBuilder: (BuildContext context, int index) {
+
         if (index == 0) {
           // Primera tarjeta: botón para añadir un viaje
           return Card(
@@ -124,9 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: () async {
+
                         InterfazCrearViaje().cambiarVentana(context);
-
-
 
                   await sql_helper.insertViaje(Viaje(
                       id: viajes.isEmpty ? 1 : viajes.last.id! + 1, // Asegura un ID único
@@ -135,7 +98,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   fecha_fin: DateTime.now().add(Duration(days: 5)),
                   ubicacion: "Ubicación Ejemplo",
                   calificacionViaje: 4,
+
                   ));
+
                   cargarViajes();
                 },
 
@@ -155,8 +120,16 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           );
         }
+
+	// aqui lo mismo que el anterior seguimos funcionando con el itemBuilder porque 
+	// todo lo de arriba esta funcionando con la condicional de si no hay ninguna
+
         // Tarjetas de viajes
+	// esto es el idex de viaje que lo va a consultar en nuestra lita para ir añadiento
         final viaje = viajes[index - 1]; // Restamos 1 porque el primer índice es la tarjeta de añadir
+
+	// return de lo que vamos a añadir
+	// Retornara cada carta por viaje que tengamos
         return Card(
           color: Colors.white,
           shape: RoundedRectangleBorder(
@@ -192,53 +165,92 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+```
 
+# SQLITE Con Dart
 
-  Widget mostrarLista() {
+```dart
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+import 'Viaje.dart';
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.7,
-      width: MediaQuery.of(context).size.width * 0.3,
-      child: ListView.builder(
-        itemCount: viajes.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text(viajes[index].destino, textAlign: TextAlign.center),
-            subtitle: Text(viajes[index].fecha_inicio.toString(), textAlign: TextAlign.center),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () async {
-                await sql_helper.deleteViaje(viajes[index].id);
-                cargarViajes();
-              },
-            ),
-          );
-        },
-      ),
+// Primero creamos una clase SQL_HELPER
+
+class SQL_Helper {
+
+// Esta Tiene como propiedad un Objeto Database que puede ser nulo y es privado 
+	Database? _database;
+
+//  Luego tenemos una funtion donde retorna un objeto Future con la DataBase async
+//  Los Future Son instancia de la clase Future de dart que representa los resultado de una operacion asincrona que nos devuelve dos estados:
+//  completado y no completado, Ejemplo de como funciona: Es como si montaramos un agua a calentar en una tetera, podemos hacer diferentes cosas
+//  mietra esta calienta y esta nos avisara cuando este ya caliente el agua.
+
+// Funciona como los Thread en java 
+
+// Se puede utiliza cuando utilizamos datos de servicio de internet y como en este caso como la bd
+
+// En este metodo lo que hacemos es devolver la conexion de la bd
+  Future<Database> getConnection() async {
+    if (_database != null) return _database!;
+
+    // Aqui pedimos la ruta donde la aplicacion puede guardar  y recuperar archivo
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    // Aqui obtenemos la ruta uniendo la bd con el documentDirectory
+    String path = join(documentsDirectory.path, 'travel_tales.db');
+
+    // Aqui utilizamos el metodo openDatabase para establecer la conexion
+    _database = await openDatabase(
+   // Le pasariamos la ruta, la vercion y aplicacon el db.execute para crear la tabla
+      path,
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute(
+          '''CREATE TABLE viajes(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            destino TEXT,
+            fecha_inicio TEXT,
+            fecha_fin TEXT,
+            ubicacion TEXT,
+            calificacionViaje INTEGER
+          )''',
+        );
+      },
+    );
+    return _database!;
+  }
+
+  Future<List<Viaje>> viajes() async {
+    final Database db = await getConnection();
+    final List<Map<String, dynamic>> maps = await db.query('viajes');
+    return List.generate(maps.length, (i) {
+      return Viaje.fromMap(maps[i]);
+    });
+  }
+
+  Future<void> insertViaje(Viaje viaje) async {
+    final Database db = await getConnection();
+    await db.insert(
+      'viajes',
+      viaje.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
-}
 
-class PageAddViaje extends StatelessWidget {
-  const PageAddViaje({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Añadir Viaje'),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/fondo.jpg"),
-            fit: BoxFit.cover, // Ajusta la imagen al tamaño de la pantalla
-          ),
-        ),
-        child: Center(
-          child: Text("Hola, Flutter!", style: TextStyle(color: Colors.white, fontSize: 24)),
-        ),
-      ),
+  Future<void> deleteViaje(int? id) async {
+    final Database db = await getConnection();
+    await db.delete(
+      'viajes',
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
+
+  Future<void> deleteAll() async {
+    final db = await getConnection();
+    await db.delete('viajes');
+    }
 }
+```

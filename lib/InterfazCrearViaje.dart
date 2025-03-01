@@ -1,6 +1,8 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:travel_tales/InterfazCrearViaje.dart';
 
 class InterfazCrearViaje extends StatefulWidget {
   const InterfazCrearViaje({super.key});
@@ -23,6 +25,7 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
   final _fechaFinController = TextEditingController();
   final _ubicacionController = TextEditingController();
   final _calificacionController = TextEditingController();
+  late List<String> _Photos = [];
   String? _photoPath;
 
   @override
@@ -81,11 +84,44 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
                 decoration: const InputDecoration(
                   labelText: 'Calificación',
                 ),
-              )
+              ),
+              SizedBox(height: 20),
+              Text("Añadir fotos:"),
+             
+              SizedBox(height: 20),
+              Column(
+                  children: [
+                    SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: 
+                    Row(
+                      children: [
+                        for (final photo in _Photos)
+                          Column(
+                            children: [
+                            Image.file(File(photo), width: 200, height: 200),
+                            ],
+                          )
+                          
+                      ],
+                    ),
+                  ),
+                  ],
+                ),
+               IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () {
+                  setState(() => _Photos.clear());
+
+                },      
+                ),
+            
             ],
           ),
         ),
       ),
+    
+    
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -95,7 +131,7 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
         onPressed: () async {
           final path = await CameraGalleryService().selectPhoto();
           if (path == null) return;
-          setState(() => _photoPath = path);
+          setState(() => _Photos.add(path));
         },
       ),
           const SizedBox(height: 16),
@@ -105,11 +141,13 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
             onPressed: () async {
               final path = await CameraGalleryService().takePhoto();
               if (path == null) return;
-              setState(() => _photoPath = path);
+
+              setState(() => _Photos.add(path));
             },
           ),
         ],
       ),
+          
     );
   }
 
@@ -130,10 +168,17 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
       initialDate: DateTime.now(),
     );
   }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(IterableProperty<String>('_Photos', _Photos));
+  }
 }
 
 
   class CameraGalleryService {
+
     final ImagePicker _picker = ImagePicker();
 
     Future<String?> selectPhoto() async {
@@ -142,6 +187,7 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
         preferredCameraDevice: CameraDevice.rear,
       );
       if (photo == null) return null;
+    
       return photo.path;
     }
 
