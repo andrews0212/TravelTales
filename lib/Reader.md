@@ -1,8 +1,7 @@
-# Como Hacer una lista con una BD
+# 1. Como Hacer una lista con una BD
 
 
 ```dart
-
 class _MyHomePageState extends State<MyHomePage> {
 // Primero lo que hacemos en en nuestro Pagina declarar el SQL_HELPER y La lista estatica
 // de Viaje
@@ -167,7 +166,7 @@ Nuestra lista esta conformada de esta forma
   }
 ```
 
-# SQLITE Con Dart
+# 2. SQLITE Con Dart
 
 ```dart
 import 'package:path_provider/path_provider.dart';
