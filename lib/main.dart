@@ -50,26 +50,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void cargarViajes() async {
-    final datos = await sql_helper.viajes();
-    print("Viajes cargados: ${datos.length}"); // Debug
-    setState(() {
-      viajes = datos;
-    });
-  }
-
+  final datos = await sql_helper.viajes();
+  print("Viajes cargados: ${datos.length}"); // Debug
+  setState(() {
+    viajes = datos;
+  });
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255,196, 255, 249),
         bottom: PreferredSize(
-        preferredSize: Size.fromHeight(2.0), // Grosor de la línea
-        child: Container(
-        color: Colors.black.withOpacity(0.5), // Color de la línea
-        height: 2.0, // Grosor de la línea
-        ),
+          preferredSize: Size.fromHeight(2.0), // Grosor de la línea
+          child: Container(
+            color: Colors.black.withOpacity(0.5), // Color de la línea
+            height: 2.0, // Grosor de la línea
+          ),
         ),
         actions: <Widget>[
           SizedBox(
@@ -77,12 +75,11 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 40,
             child: SearchBar(
               overlayColor: WidgetStateProperty.all(Colors.white12),
-              leading: const Icon(Icons.search, color: Color.fromARGB(255, 28, 90, 69)),
+              leading: const Icon(Icons.search, color: Color(0xFF1C5A45)),
               hintText: "Buscar",
-              backgroundColor: WidgetStateProperty.all(Color.fromARGB(255,156, 234, 239)),
+              backgroundColor: WidgetStateProperty.all(Color(0xFF9CEAEF)),
               elevation: WidgetStateProperty.all(0),
               side: WidgetStateProperty.all(BorderSide(color: Colors.black.withOpacity(0.2), width: 1)),
-
             ),
           ),
         ],
@@ -96,9 +93,10 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-
+    
     );
   }
+
   Widget mostrarListaCard() {
     return GridView.builder(
       padding: EdgeInsets.all(8.0),
@@ -124,35 +122,28 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: () async {
-                        InterfazCrearViaje().cambiarVentana(context);
-
-
-
-                  await sql_helper.insertViaje(Viaje(
-                      id: viajes.isEmpty ? 1 : viajes.last.id! + 1, // Asegura un ID único
-                      destino: "Nuevo Destino",
-                      fecha_inicio: DateTime.now(),
-                  fecha_fin: DateTime.now().add(Duration(days: 5)),
-                  ubicacion: "Ubicación Ejemplo",
-                  calificacionViaje: 4,
-                  ));
-                  cargarViajes();
+                  // Al hacer clic en la tarjeta de añadir, se abre la pantalla para crear un viaje
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InterfazCrearViaje(actualizarViajes: cargarViajes),
+                    ),
+                  );
+                  cargarViajes(); // Recargar los viajes al regresar
                 },
-
                 child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-
-                  Icon(Icons.add, color: Colors.black, size: 50),
-                  SizedBox(height: 10),
-                  Text(
-                    "Añadir Viaje",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                ],
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add, color: Colors.black, size: 50),
+                    SizedBox(height: 10),
+                    Text(
+                      "Añadir Viaje",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
           );
         }
         // Tarjetas de viajes
@@ -180,6 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text("Calificación: ${viaje.calificacionViaje}/5", textAlign: TextAlign.center),
                 IconButton(
                   onPressed: () async {
+                    
                     await sql_helper.deleteViaje(viaje.id);
                     cargarViajes();
                   },
@@ -192,53 +184,5 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-
-
-  Widget mostrarLista() {
-
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.7,
-      width: MediaQuery.of(context).size.width * 0.3,
-      child: ListView.builder(
-        itemCount: viajes.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text(viajes[index].destino, textAlign: TextAlign.center),
-            subtitle: Text(viajes[index].fecha_inicio.toString(), textAlign: TextAlign.center),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () async {
-                await sql_helper.deleteViaje(viajes[index].id);
-                cargarViajes();
-              },
-            ),
-          );
-        },
-      ),
-    );
-  }
 }
 
-class PageAddViaje extends StatelessWidget {
-  const PageAddViaje({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Añadir Viaje'),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/fondo.jpg"),
-            fit: BoxFit.cover, // Ajusta la imagen al tamaño de la pantalla
-          ),
-        ),
-        child: Center(
-          child: Text("Hola, Flutter!", style: TextStyle(color: Colors.white, fontSize: 24)),
-        ),
-      ),
-    );
-  }
-}

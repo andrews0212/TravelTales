@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Viaje {
   int? id;
   String destino;
@@ -5,14 +7,15 @@ class Viaje {
   DateTime fecha_fin;
   String ubicacion;
   int calificacionViaje;
+  List<String> viajes;
 
   Viaje({
-    required this.id,
     required this.destino,
     required this.fecha_inicio,
     required this.fecha_fin,
     required this.ubicacion,
     required this.calificacionViaje,
+    required this.viajes
   });
 
 
@@ -29,14 +32,18 @@ class Viaje {
   }
 
   // Método para convertir un mapa de la base de datos a un objeto 'Viaje'
-  static Viaje fromMap(Map<String, dynamic> map) {
+ factory Viaje.fromMap(Map<String, dynamic> map) {
     return Viaje(
-      id: map['id'],
-      destino: map['destino'],
-      fecha_inicio: DateTime.parse(map['fecha_inicio']), // Convierte el String de vuelta a DateTime
-      fecha_fin: DateTime.parse(map['fecha_fin']),       // Convierte el String de vuelta a DateTime
-      ubicacion: map['ubicacion'],
-      calificacionViaje: map['calificacionViaje'],
+      destino: map['destino'] ?? 'Desconocido', // Valor por defecto si es null
+      fecha_inicio: map['fecha_inicio'] != null
+          ? DateTime.parse(map['fecha_inicio'])
+          : DateTime.now(), // Valor por defecto si es null
+      fecha_fin: map['fecha_fin'] != null
+          ? DateTime.parse(map['fecha_fin'])
+          : DateTime.now(), // Valor por defecto si es null
+      ubicacion: map['ubicacion'] ?? 'No especificada', // Valor por defecto si es null
+      calificacionViaje: map['calificacion_viaje'] ?? 0, // Valor por defecto si es null
+      viajes: List<String>.from(map['viajes'] ?? []), // Valor por defecto si es null
     );
-  }
+ }
 }

@@ -1,22 +1,22 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:travel_tales/SQL_Herper.dart';
+import 'package:travel_tales/Viaje.dart';
 
 class InterfazCrearViaje extends StatefulWidget {
-  const InterfazCrearViaje({super.key});
+  final Function actualizarViajes; // Callback que se usará para actualizar la lista en el Main
+
+  const InterfazCrearViaje({super.key, required this.actualizarViajes});
+  
 
   @override
   State<InterfazCrearViaje> createState() => _InterfazCrearViajeState();
 
-  void cambiarVentana(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) => const InterfazCrearViaje(),
-      ),
-    );
-  }
 }
 
 class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
@@ -25,13 +25,18 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
   final _fechaFinController = TextEditingController();
   final _ubicacionController = TextEditingController();
   final _calificacionController = TextEditingController();
+
   late List<String> _Photos = [];
   String? _photoPath;
+  final SQL_Helper sql_helper = SQL_Helper();
+
+
+ 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Añadir Viaje')),
+      appBar: AppBar(title: const Text('Añadir Viaje', style: TextStyle(color: Color(0xFF1C5A45))),backgroundColor: Color(0xFF9CEAEF)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(30),
@@ -80,36 +85,21 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
                   labelText: 'Ubicación',
                 ),
               ),
-              TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Calificación',
-                ),
+             TextField(
+              controller: _calificacionController, // Ahora tiene un controlador
+              decoration: const InputDecoration(
+                labelText: 'Calificación',
               ),
+              keyboardType: TextInputType.number, // Para restringir la entrada a números
+              ),
+
               SizedBox(height: 20),
               Text("Añadir fotos:"),
-             
+              mostrarLista(),
               SizedBox(height: 20),
-              Column(
-                  children: [
-                    SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: 
-                    Row(
-                      children: [
-                        for (final photo in _Photos)
-                          Column(
-                            children: [
-                            Image.file(File(photo), width: 200, height: 200),
-                            ],
-                          )
-                          
-                      ],
-                    ),
-                  ),
-                  ],
-                ),
-               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
+
+               TextButton(
+                child: Text("Eliminar Todos"),
                 onPressed: () {
                   setState(() => _Photos.clear());
 
@@ -145,10 +135,29 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
               setState(() => _Photos.add(path));
             },
           ),
+          FloatingActionButton(child: Icon(Icons.save),onPressed: (){
+          List<int> fecha_inicio = _fechaInicioController.text.split("/").map((e) => int.parse(e)).toList();
+          List<int> fecha_fin = _fechaFinController.text.split("/").map((e) => int.parse(e)).toList();
+
+          DateTime inicio = DateTime(fecha_inicio[2], fecha_inicio[1], fecha_inicio[0]);
+          DateTime fin = DateTime(fecha_fin[2], fecha_fin[1], fecha_fin[0]);
+
+            
+              sql_helper.insertViaje(new Viaje(
+                destino: _destinoController.text,
+                fecha_inicio: DateTime(fecha_inicio[0], fecha_inicio[1], fecha_inicio[2]),
+                fecha_fin: DateTime(fecha_fin[0], fecha_fin[1], fecha_fin[2]),
+                ubicacion: _ubicacionController.text,
+                calificacionViaje: int.parse(_calificacionController.text),
+                viajes: _Photos));
+                
+          })
+          
         ],
       ),
           
     );
+    
   }
 
   Future<DateTime?> _selectDate(BuildContext context) async {
@@ -174,6 +183,35 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
     super.debugFillProperties(properties);
     properties.add(IterableProperty<String>('_Photos', _Photos));
   }
+  
+ Widget mostrarLista() {
+  return SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Row( // Usamos Row en lugar de ListView.builder
+      children: _Photos.map((photoPath) {
+        int index = _Photos.indexOf(photoPath); // Obtener el índice de cada foto
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Column(
+            children: [
+              Image.file(File(photoPath), width: 100, height: 100), // Ajusta el tamaño de la imagen si es necesario
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _Photos.removeAt(index); // Usar removeAt() para eliminar por índice
+                  });
+                },
+                icon: const Icon(Icons.delete, color: Colors.red),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    ),
+  );
+}
+
+
 }
 
 
@@ -201,14 +239,6 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
       return photo.path;
     }
 
-    void cambiarVentana(BuildContext context) {
-      print("Cambiando de ventana...");
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (BuildContext context) => const InterfazCrearViaje(),
-        ),
-      );
-    }
+  
+   
   }
-
-
