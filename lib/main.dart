@@ -42,6 +42,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int currentPageIndex = 0;
   final SQL_Helper sql_helper = SQL_Helper();
   List<Viaje> viajes = []; // Lista local en memoria
 
@@ -80,9 +81,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: Color(0xFFC4FFF9),
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
+        indicatorColor: Color(0xFF1C5A45),
+        selectedIndex: currentPageIndex,
+        destinations: const <Widget>[
+          NavigationDestination(
+            selectedIcon: Icon(Icons.all_inbox, color: Color(0xFFC4FFF9),),
+            icon: Icon(Icons.all_inbox),
+            label: 'Todos',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.favorite, color: Color(0xFFC4FFF9),),
+            icon: Badge(child: Icon(Icons.favorite)),
+            label: 'Favoritos',
+          ),
+        ],
+      ),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 196, 255, 249),
+        backgroundColor: Color(0xFFC4FFF9),
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(2.0), // Grosor de la línea
           child: Container(
@@ -166,6 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
     );
+    
   }
 
   styleViajeCard(Viaje viaje) {
