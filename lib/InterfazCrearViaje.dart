@@ -135,6 +135,7 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
               setState(() => _Photos.add(path));
             },
           ),
+          const SizedBox(height: 16),
           FloatingActionButton(child: Icon(Icons.save),onPressed: (){
           List<int> fecha_inicio = _fechaInicioController.text.split("/").map((e) => int.parse(e)).toList();
           List<int> fecha_fin = _fechaFinController.text.split("/").map((e) => int.parse(e)).toList();
