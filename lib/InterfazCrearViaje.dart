@@ -1,10 +1,8 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:travel_tales/SQL_Herper.dart';
 import 'package:travel_tales/Viaje.dart';
 
