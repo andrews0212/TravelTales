@@ -46,14 +46,10 @@ Future<List<Viaje>> viajes() async {
   
   return List.generate(maps.length, (i) {
     // Convertir la cadena 'viajes' en una lista
-    List<String> viajesList = maps[i]['viajes'] != null
-        ? maps[i]['viajes'].split(',')
-        : []; // Si es null, asignar una lista vacía
+    List<String> viajesList = maps[i]['viajes'] != null ? maps[i]['viajes'].split(',') : []; // Si es null, asignar una lista vacía
 
     // Pasamos la lista 'viajesList' al constructor de Viaje
-    return Viaje.fromMap({
-      ...maps[i],
-      'viajes': viajesList, // Aquí asignamos la lista obtenida
+    return Viaje.fromMap({...maps[i], 'viajes': viajesList, // Aquí asignamos la lista obtenida
     });
   });
 }

@@ -142,11 +142,13 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
           DateTime inicio = DateTime(fecha_inicio[2], fecha_inicio[1], fecha_inicio[0]);
           DateTime fin = DateTime(fecha_fin[2], fecha_fin[1], fecha_fin[0]);
 
+          print("${inicio}   ${fin}" );
+
             
               sql_helper.insertViaje(new Viaje(
                 destino: _destinoController.text,
-                fecha_inicio: DateTime(fecha_inicio[0], fecha_inicio[1], fecha_inicio[2]),
-                fecha_fin: DateTime(fecha_fin[0], fecha_fin[1], fecha_fin[2]),
+                fecha_inicio: inicio,
+                fecha_fin: fin,
                 ubicacion: _ubicacionController.text,
                 calificacionViaje: int.parse(_calificacionController.text),
                 viajes: _Photos));
