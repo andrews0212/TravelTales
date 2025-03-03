@@ -8,6 +8,7 @@ class Viaje {
   String ubicacion;
   int calificacionViaje;
   List<String> viajes;
+  
 
   Viaje({
     this.id,
