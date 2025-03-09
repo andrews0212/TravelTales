@@ -6,7 +6,7 @@ class Viaje {
   DateTime fecha_inicio;
   DateTime fecha_fin;
   String ubicacion;
-  int calificacionViaje;
+  String calificacionViaje;
   List<String> viajes;
   bool favorito;
   
@@ -19,7 +19,8 @@ class Viaje {
     required this.ubicacion,
     required this.calificacionViaje,
     required this.viajes,
-    }) : favorito = false;
+      required this.favorito,
+    });
   
 
 
@@ -32,6 +33,7 @@ class Viaje {
       'fecha_fin': fecha_fin.toIso8601String(),        // Convierte DateTime a String
       'ubicacion': ubicacion,
       'calificacionViaje': calificacionViaje,
+      'favorito': favorito,
     };
   }
 
@@ -47,8 +49,9 @@ class Viaje {
           ? DateTime.parse(map['fecha_fin'])
           : DateTime.now(), // Valor por defecto si es null
       ubicacion: map['ubicacion'] ?? 'No especificada', // Valor por defecto si es null
-      calificacionViaje: map['calificacion_viaje'] ?? 0, // Valor por defecto si es null
+      calificacionViaje: map['calificacionViaje'], // Valor por defecto si es null
       viajes: List<String>.from(map['viajes'] ?? []), // Valor por defecto si es null
+      favorito: map['favorito'] == 1, // Convierte 0 o 1 a booleano
     );
  }
 }

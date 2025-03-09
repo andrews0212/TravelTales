@@ -57,6 +57,12 @@ class _MyHomePageState extends State<MyHomePage> {
       todosLosViajes = List.from(datos); // Guardamos una copia de la lista completa
     });
   }
+   void cargarFavoritos() async {
+    final datos = await sql_helper.getFavoritos();
+    setState(() {
+      viajes = datos;
+    });
+  }
 
   Widget buscador() {
     return SizedBox(
@@ -121,8 +127,13 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: NavigationBar(
         backgroundColor: const Color(0xFFC4FFF9),
         onDestinationSelected: (int index) {
-          setState(() {
+           setState(() {
             currentPageIndex = index;
+            if (index == 0) {
+              cargarViajes();
+            } else if (index == 1) {
+              cargarFavoritos();
+            }
           });
         },
         indicatorColor: const Color(0xFF1C5A45),
@@ -285,20 +296,45 @@ class _MyHomePageState extends State<MyHomePage> {
                         Text("Desde: ${viaje.fecha_inicio.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
                         Text("Hasta: ${viaje.fecha_fin.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
                         Text("Ubicación: ${viaje.ubicacion}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
-                        Text("Calificación: ${viaje.calificacionViaje}/5", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
-                        IconButton(
+                        Text("Calificación: ${viaje.calificacionViaje}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+                        Row(
+                          spacing: 60,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
                           onPressed: () async {
                             await sql_helper.deleteViaje(viaje);
                             cargarViajes(); // Recargar los viajes después de la eliminación
                           },
                           icon: const Icon(Icons.delete, color: Colors.red),
                         ),
+                            IconButton(
+                              onPressed: () async {
+                              viaje.favorito = !viaje.favorito; // Cambia el estado del favorito
+                              await sql_helper.updateViaje(viaje); // Actualiza en la base de datos
+                              setState(() {
+                                // Actualiza el estado de la UI
+                                
+                              });
+                              },
+                              icon: Icon(
+                              viaje.favorito ? Icons.star : Icons.star_border_sharp,
+                              color: viaje.favorito ? const Color.fromARGB(255, 248, 223, 3) : Colors.grey,
+                              ),
+                            )
+                          ],
+                        ),
+                        
                       ],
                     ),
                   ),
-                ],
+                  
+                  ],
+                  
               ),
+              
             ),
+            
           ),
         );
       },
@@ -306,7 +342,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   BoxDecoration styleViajeCard(Viaje viaje) {
-    if (viaje.viajes.isNotEmpty) {
+    if (viaje.viajes[0] != "") {
       String rutaImagen = viaje.viajes[0];
       File archivoImagen = File(rutaImagen);
       // Verificar si la imagen existe antes de usar FileImage

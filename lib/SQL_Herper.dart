@@ -6,7 +6,7 @@ import 'Viaje.dart';
 
 class SQL_Helper {
   Database? _database;
-
+  final String CREATE_TABLE = "CREATE TABLE viajes(id INTEGER PRIMARY KEY AUTOINCREMENT,destino TEXT,fecha_inicio TEXT,fecha_fin TEXT,ubicacion TEXT,calificacionViaje TEXT,viajes TEXT,favorito BOOLEAN)";
  Future<Database> getConnection() async {
   if (_database != null) return _database!;
 
@@ -17,28 +17,31 @@ class SQL_Helper {
   // Abrir la base de datos con migración
   _database = await openDatabase(
     path,
-    version: 4, // 🚨 Aumenta la versión
+    version: 5, // 🚨 Aumenta la versión
     onCreate: (Database db, int version) async {
-      await db.execute(
-        '''CREATE TABLE viajes(
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          destino TEXT,
-          fecha_inicio TEXT,
-          fecha_fin TEXT,
-          ubicacion TEXT,
-          calificacionViaje INTEGER,
-          viajes TEXT,
-          favorito BOOLEAN
-        )''',
-      );
+      await db.execute(this.CREATE_TABLE);
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
-      if (oldVersion < 4) {
-        await db.execute("ALTER TABLE viajes ADD COLUMN favorito BOOLEAN;");
+      if (oldVersion < 5) {
+        await db.execute("DROP TABLE IF EXISTS viajes");
+        await db.execute(this.CREATE_TABLE);
       }
     },
   );
   return _database!;
+}
+Future<List<Viaje>> getFavoritos() async {
+  final Database db = await getConnection();
+  final List<Map<String, dynamic>> maps = await db.query(
+    'viajes',
+    where: 'favorito = ?',
+    whereArgs: [1],  // 1 representa true en SQLite
+  );
+
+  return List.generate(maps.length, (i) {
+    List<String> viajesList = maps[i]['viajes'] != null ? maps[i]['viajes'].split(',') : [];
+    return Viaje.fromMap({...maps[i], 'viajes': viajesList});
+  });
 }
 
 Future<List<Viaje>> viajes() async {
@@ -76,7 +79,25 @@ Future<void> insertViaje(Viaje viaje) async {
   // Asigna el id generado al objeto viaje
   viaje.id = id;  // Asigna el id generado por SQLite
 }
-
+Future<void> updateViaje(Viaje viaje) async {
+  final Database db = await getConnection();
+  
+  await db.update(
+    'viajes',
+    {
+      'destino': viaje.destino,
+      'fecha_inicio': viaje.fecha_inicio.toIso8601String(),
+      'fecha_fin': viaje.fecha_fin.toIso8601String(),
+      'ubicacion': viaje.ubicacion,
+      'calificacionViaje': viaje.calificacionViaje,
+      'viajes': viaje.viajes.join(','),  // Convierte la lista en una cadena separada por comas
+      'favorito': viaje.favorito ? 1 : 0  // Convertir booleano a entero
+    },
+    where: 'id = ?',
+    whereArgs: [viaje.id],  // Usar el id del viaje
+    conflictAlgorithm: ConflictAlgorithm.replace,
+  );
+}
 
 
 Future<void> deleteViaje(Viaje viaje) async {

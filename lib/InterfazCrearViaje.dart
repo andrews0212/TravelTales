@@ -149,8 +149,9 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
                 fecha_inicio: inicio,
                 fecha_fin: fin,
                 ubicacion: _ubicacionController.text,
-                calificacionViaje: int.parse(_calificacionController.text),
-                viajes: _Photos));
+                calificacionViaje: _calificacionController.text,
+                viajes: _Photos,
+                favorito: false));
                 
           })
           
