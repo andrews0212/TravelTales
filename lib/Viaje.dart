@@ -8,6 +8,7 @@ class Viaje {
   String ubicacion;
   int calificacionViaje;
   List<String> viajes;
+  bool favorito;
   
 
   Viaje({
@@ -17,8 +18,9 @@ class Viaje {
     required this.fecha_fin,
     required this.ubicacion,
     required this.calificacionViaje,
-    required this.viajes
-  });
+    required this.viajes,
+    }) : favorito = false;
+  
 
 
   // Método para convertir un objeto 'Viaje' a un mapa para insertarlo en la base de datos

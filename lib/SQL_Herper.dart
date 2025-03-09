@@ -17,7 +17,7 @@ class SQL_Helper {
   // Abrir la base de datos con migración
   _database = await openDatabase(
     path,
-    version: 3, // 🚨 Aumenta la versión
+    version: 4, // 🚨 Aumenta la versión
     onCreate: (Database db, int version) async {
       await db.execute(
         '''CREATE TABLE viajes(
@@ -27,13 +27,14 @@ class SQL_Helper {
           fecha_fin TEXT,
           ubicacion TEXT,
           calificacionViaje INTEGER,
-          viajes TEXT
+          viajes TEXT,
+          favorito BOOLEAN
         )''',
       );
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
-      if (oldVersion < 3) {
-        await db.execute("ALTER TABLE viajes ADD COLUMN viajes TEXT;");
+      if (oldVersion < 4) {
+        await db.execute("ALTER TABLE viajes ADD COLUMN favorito BOOLEAN;");
       }
     },
   );
@@ -66,7 +67,8 @@ Future<void> insertViaje(Viaje viaje) async {
       'fecha_fin': viaje.fecha_fin.toIso8601String(),
       'ubicacion': viaje.ubicacion,
       'calificacionViaje': viaje.calificacionViaje,
-      'viajes': viaje.viajes.join(','), // Convierte la lista en una cadena separada por comas
+      'viajes': viaje.viajes.join(','),  // Convierte la lista en una cadena separada por comas
+      'favorito': viaje.favorito ? 1 : 0  // Convertir booleano a entero
     },
     conflictAlgorithm: ConflictAlgorithm.replace,
   );
