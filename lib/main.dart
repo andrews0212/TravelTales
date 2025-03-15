@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:travel_tales/DetalleViaje.dart';
 import 'package:travel_tales/InterfazCrearViaje.dart';
 import 'SQL_Herper.dart';
 import 'Viaje.dart';
@@ -269,72 +269,75 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         // Tarjetas de viajes
         final viaje = viajes[index - 1]; // Restamos 1 porque el primer índice es la tarjeta de añadir
-        return Container(
-          decoration: styleViajeCard(viaje),
-          child: Card(
-            color: Colors.transparent, // Hace que la Card sea transparente
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            elevation: 5,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    color: Colors.black.withOpacity(0.5), // Fondo negro transparente
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          viaje.destino,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text("Desde: ${viaje.fecha_inicio.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
-                        Text("Hasta: ${viaje.fecha_fin.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
-                        Text("Ubicación: ${viaje.ubicacion}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
-                        Text("Calificación: ${viaje.calificacionViaje}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
-                        Row(
-                          spacing: 60,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                          onPressed: () async {
-                            await sql_helper.deleteViaje(viaje);
-                            cargarViajes(); // Recargar los viajes después de la eliminación
-                          },
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                        ),
-                            IconButton(
-                              onPressed: () async {
-                              viaje.favorito = !viaje.favorito; // Cambia el estado del favorito
-                              await sql_helper.updateViaje(viaje); // Actualiza en la base de datos
-                              setState(() {
-                                // Actualiza el estado de la UI
-                                
-                              });
-                              },
-                              icon: Icon(
-                              viaje.favorito ? Icons.star : Icons.star_border_sharp,
-                              color: viaje.favorito ? const Color.fromARGB(255, 248, 223, 3) : Colors.grey,
-                              ),
-                            )
-                          ],
-                        ),
-                        
-                      ],
-                    ),
-                  ),
-                  
-                  ],
-                  
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetalleViaje(viaje: viaje),
               ),
-              
+            );
+          },
+          child: Container(
+            decoration: styleViajeCard(viaje),
+            child: Card(
+              color: Colors.transparent, // Hace que la Card sea transparente
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              elevation: 5,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      color: Colors.black.withOpacity(0.5), // Fondo negro transparente
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            viaje.destino,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text("Desde: ${viaje.fecha_inicio.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+                          Text("Hasta: ${viaje.fecha_fin.toLocal().toString().split(' ')[0]}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+                          Text("Ubicación: ${viaje.ubicacion}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+                          Text("Calificación: ${viaje.calificacionViaje}", textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                onPressed: () async {
+                                  await sql_helper.deleteViaje(viaje);
+                                  cargarViajes(); // Recargar los viajes después de la eliminación
+                                },
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                              ),
+                              IconButton(
+                                onPressed: () async {
+                                  viaje.favorito = !viaje.favorito; // Cambia el estado del favorito
+                                  await sql_helper.updateViaje(viaje); // Actualiza en la base de datos
+                                  setState(() {
+                                    // Actualiza el estado de la UI
+                                  });
+                                },
+                                icon: Icon(
+                                  viaje.favorito ? Icons.star : Icons.star_border_sharp,
+                                  color: viaje.favorito ? const Color.fromARGB(255, 248, 223, 3) : Colors.grey,
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            
           ),
         );
       },

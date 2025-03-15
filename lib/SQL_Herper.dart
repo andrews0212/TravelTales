@@ -19,12 +19,12 @@ class SQL_Helper {
     path,
     version: 5, // 🚨 Aumenta la versión
     onCreate: (Database db, int version) async {
-      await db.execute(this.CREATE_TABLE);
+      await db.execute(CREATE_TABLE);
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
       if (oldVersion < 5) {
         await db.execute("DROP TABLE IF EXISTS viajes");
-        await db.execute(this.CREATE_TABLE);
+        await db.execute(CREATE_TABLE);
       }
     },
   );

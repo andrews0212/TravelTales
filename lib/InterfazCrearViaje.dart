@@ -24,7 +24,7 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
   final _ubicacionController = TextEditingController();
   final _calificacionController = TextEditingController();
 
-  late List<String> _Photos = [];
+  late final List<String> _Photos = [];
   String? _photoPath;
   final SQL_Helper sql_helper = SQL_Helper();
 
@@ -135,16 +135,16 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
           ),
           const SizedBox(height: 16),
           FloatingActionButton(child: Icon(Icons.save),onPressed: (){
-          List<int> fecha_inicio = _fechaInicioController.text.split("/").map((e) => int.parse(e)).toList();
-          List<int> fecha_fin = _fechaFinController.text.split("/").map((e) => int.parse(e)).toList();
+          List<int> fechaInicio = _fechaInicioController.text.split("/").map((e) => int.parse(e)).toList();
+          List<int> fechaFin = _fechaFinController.text.split("/").map((e) => int.parse(e)).toList();
 
-          DateTime inicio = DateTime(fecha_inicio[2], fecha_inicio[1], fecha_inicio[0]);
-          DateTime fin = DateTime(fecha_fin[2], fecha_fin[1], fecha_fin[0]);
+          DateTime inicio = DateTime(fechaInicio[2], fechaInicio[1], fechaInicio[0]);
+          DateTime fin = DateTime(fechaFin[2], fechaFin[1], fechaFin[0]);
 
-          print("${inicio}   ${fin}" );
+          print("$inicio   $fin" );
 
             
-              sql_helper.insertViaje(new Viaje(
+              sql_helper.insertViaje(Viaje(
                 destino: _destinoController.text,
                 fecha_inicio: inicio,
                 fecha_fin: fin,
