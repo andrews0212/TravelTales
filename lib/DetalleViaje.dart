@@ -32,13 +32,15 @@ class _DetalleViajeState extends State<DetalleViaje> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.viaje.destino),
-        backgroundColor: const Color(0xFF1C5A45),
+        backgroundColor: const Color(0xFFC4FFF9),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
+        
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+           
             Text(
               widget.viaje.destino,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

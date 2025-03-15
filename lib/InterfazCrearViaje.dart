@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'package:travel_tales/SQL_Herper.dart';
+import 'package:travel_tales/Validaciones.dart';
 import 'package:travel_tales/Viaje.dart';
 
 class InterfazCrearViaje extends StatefulWidget {
@@ -134,32 +136,59 @@ class _InterfazCrearViajeState extends State<InterfazCrearViaje> {
             },
           ),
           const SizedBox(height: 16),
-          FloatingActionButton(child: Icon(Icons.save),onPressed: (){
-          List<int> fechaInicio = _fechaInicioController.text.split("/").map((e) => int.parse(e)).toList();
-          List<int> fechaFin = _fechaFinController.text.split("/").map((e) => int.parse(e)).toList();
-
-          DateTime inicio = DateTime(fechaInicio[2], fechaInicio[1], fechaInicio[0]);
-          DateTime fin = DateTime(fechaFin[2], fechaFin[1], fechaFin[0]);
-
-          print("$inicio   $fin" );
-
-            
-              sql_helper.insertViaje(Viaje(
-                destino: _destinoController.text,
-                fecha_inicio: inicio,
-                fecha_fin: fin,
-                ubicacion: _ubicacionController.text,
-                calificacionViaje: _calificacionController.text,
-                viajes: _Photos,
-                favorito: false));
-                
-          })
           
+          FloatingActionButton(child: Icon(Icons.save),onPressed: (){
+            if (_destinoController.text.isEmpty){
+               Alerta("Destino no puede estar vacio", context);
+            }else if(_fechaInicioController.text.isEmpty){
+              Alerta("Fecha inicio no puede estar vacio", context);
+            }else  if(_fechaFinController.text.isEmpty){
+              Alerta("Fecha fin no puede estar vacio", context);
+            }else if(_ubicacionController.text.isEmpty){
+               Alerta("Ubicacion no puede estar vacio", context);
+            }else if(_calificacionController.text.isEmpty){
+              Alerta("Calificacion no puede estar vacio", context);
+            }else {
+              List<int> fechaInicio = _fechaInicioController.text.split("/").map((e) => int.parse(e)).toList();
+              List<int> fechaFin = _fechaFinController.text.split("/").map((e) => int.parse(e)).toList();
+              DateTime inicio = DateTime(fechaInicio[2], fechaInicio[1], fechaInicio[0]);
+              DateTime fin  = DateTime(fechaFin[2], fechaFin[1], fechaFin[0]);
+                if (Validaciones.InicioFin(inicio, fin)){
+                  Alerta("La fecha de inicio no puede ser superior a la fecha de fin", context);
+                }else if (Validaciones.calificacion(_calificacionController.text)){
+                  Alerta("Calificacion no valida", context);
+                }else if (Validaciones.clificacionRango(_calificacionController.text)){
+                  Alerta("Calificacion tiene que tener un rango del 1 al 10", context);
+                } else {
+                  sql_helper.insertViaje(Viaje(
+                    destino: _destinoController.text,
+                    fecha_inicio: inicio,
+                    fecha_fin: fin,
+                    ubicacion: _ubicacionController.text,
+                    calificacionViaje: _calificacionController.text,
+                    viajes: _Photos,
+                    favorito: false));
+                    Alerta("El viaje ha sido creado correctamente", context);
+                }
+            }
+          }
+          )          
         ],
       ),
           
     );
     
+  }
+
+  Future Alerta(String text, BuildContext context){
+    return  showDialog(context: context, builder: (context) => AlertDialog(
+                content: Text(text),
+                actions: [
+                  TextButton(onPressed: (){
+                    Navigator.of(context).pop();
+                  }, child: Text("OK")) 
+                ],
+              ));
   }
 
   Future<DateTime?> _selectDate(BuildContext context) async {
